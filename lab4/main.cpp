@@ -3,6 +3,12 @@
 #include <cmath>
 #include "RSA.h"
 
+void encryptFile(const std::string &inputFile, const std::string &outputFile, long int e, long int n);
+
+void decryptFile(const std::string &inputFile, const std::string &outputFile, long int d, long int n);
+
+void test_file_rsa();
+
 int main() {
     long int p, q, n, t, e, d;
     bool flag;
@@ -86,5 +92,93 @@ int main() {
     delete[] encryptedText;
     delete[] decryptedText;
 
+    test_file_rsa();
+
     return 0;
+}
+
+void encryptFile(const std::string &inputFile, const std::string &outputFile, long int e, long int n) {
+    std::ifstream inFile(inputFile);
+    std::ofstream outFile(outputFile);
+
+    if (!inFile) {
+        std::cerr << "Error: Unable to open input file " << inputFile << std::endl;
+        return;
+    }
+
+    if (!outFile) {
+        std::cerr << "Error: Unable to open output file " << outputFile << std::endl;
+        return;
+    }
+
+    char ch;
+    while (inFile.get(ch)) {
+        long int encryptedChar = RSA::encrypt(ch, e, n);
+        outFile << encryptedChar << " ";
+    }
+
+    inFile.close();
+    outFile.close();
+
+    std::cout << "File encrypted successfully." << std::endl;
+}
+
+void decryptFile(const std::string &inputFile, const std::string &outputFile, long int d, long int n) {
+    std::ifstream inFile(inputFile);
+    std::ofstream outFile(outputFile);
+
+    if (!inFile) {
+        std::cerr << "Error: Unable to open input file " << inputFile << std::endl;
+        return;
+    }
+
+    if (!outFile) {
+        std::cerr << "Error: Unable to open output file " << outputFile << std::endl;
+        return;
+    }
+
+    long int encryptedChar;
+    while (inFile >> encryptedChar) {
+        char decryptedChar = RSA::decrypt(encryptedChar, d, n);
+        outFile << decryptedChar;
+    }
+
+    inFile.close();
+    outFile.close();
+
+    std::cout << "File decrypted successfully." << std::endl;
+}
+
+void test_file_rsa() {
+    long int p, q, n, t, e, d;
+    bool flag;
+    std::string inputFile, outputFile;
+
+    std::cout << "Welcome to RCA program" << std::endl << std::endl;
+
+    // Inputting prime numbers p and q
+    // (Code for inputting p, q, computing n, t, e, and d goes here)
+
+    // Assuming values of p, q, n, t, e, and d are already computed
+    // (For simplicity, these values can be hardcoded or obtained from user input)
+
+    // Example values (replace these with actual computation):
+    p = 61;
+    q = 53;
+    n = p * q;
+    t = (p - 1) * (q - 1);
+    e = 17;
+    d = 2753;
+
+    std::cout << "Enter input file name: ";
+    std::cin >> inputFile;
+
+    std::cout << "Enter output file name: ";
+    std::cin >> outputFile;
+
+    // Encrypt file
+    encryptFile(inputFile, outputFile + ".enc", e, n);
+
+    // Decrypt file
+    decryptFile(outputFile + ".enc", outputFile + ".dec", d, n);
 }
