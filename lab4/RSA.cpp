@@ -8,29 +8,24 @@
 #include <iostream>
 #include <string>
 
-long int RSA::decrypt(long int i, long int d, long int n) {
-    long int current = i;
-    long int result = 1;
-
-    for (long int j = 0; j < d; j++) {
-        result = result * current;
-        result = result % n;
+long modPow(long base, long exponent, long modulus) {
+    long result = 1;
+    base = base % modulus;
+    while (exponent > 0) {
+        if (exponent % 2 == 1)
+            result = (result * base) % modulus;
+        exponent = exponent >> 1;
+        base = (base * base) % modulus;
     }
-
-    return result + 97;
+    return result;
 }
 
+long int RSA::decrypt(long int i, long int d, long int n) {
+    return (long) modPow(i, d, n);
+}
 
 long int RSA::encrypt(long int i, long int e, long int n) {
-    long int current = i - 97;
-    long int result = 1;
-
-    for (long int j = 0; j < e; j++) {
-        result = result * current;
-        result = result % n;
-    }
-
-    return result;
+    return (long) modPow(i, e, n);
 }
 
 

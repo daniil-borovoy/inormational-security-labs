@@ -7,7 +7,7 @@ void encryptFile(const std::string &inputFile, const std::string &outputFile, lo
 
 void decryptFile(const std::string &inputFile, const std::string &outputFile, long int d, long int n);
 
-void test_file_rsa();
+void test_file_rsa(long int p, long int q, long int n, long int t, long int e, long int d);
 
 int main() {
     long int p, q, n, t, e, d;
@@ -51,6 +51,11 @@ int main() {
     e = RSA::calculateE(t);
     d = RSA::calculateD(e, t);
 
+    if (d == e) {
+        std::cout << "Wrong params" << std::endl;
+        exit(1);
+    }
+
     std::cout << "\nRSA public key is (n = " << n << ", e = " << e << ")" << std::endl;
     std::cout << "RSA private key is (n = " << n << ", d = " << d << ")" << std::endl;
 
@@ -66,25 +71,34 @@ int main() {
     long int *encryptedText = new long int[maxLength];
     long int *decryptedText = new long int[maxLength];
 
+    std::cout << "Text:" << std::endl;
+    for (size_t i = 0; i < maxLength; ++i) {
+        std::cout << (int) msg[i] << " ";
+    }
+    std::cout << std::endl;
+
     // Encryption
     for (size_t i = 0; i < maxLength; i++) {
         encryptedText[i] = RSA::encrypt(msg[i], e, n);
     }
 
-    std::cout << "\nTHE ENCRYPTED MESSAGE IS:" << std::endl;
-    for (size_t i = 0; i < maxLength; i++) {
-        printf("%c", (char) encryptedText[i]);
+    std::cout << "Encrypted Text:" << std::endl;
+    for (size_t i = 0; i < maxLength; ++i) {
+        std::cout << encryptedText[i] << " ";
     }
+    std::cout << std::endl;
 
-    // Decryption
+    // Encryption
     for (size_t i = 0; i < maxLength; i++) {
-        decryptedText[i] = RSA::decrypt(encryptedText[i], d, n);
+        long a = RSA::decrypt(encryptedText[i], d, n);
+        decryptedText[i] = a;
     }
 
     std::cout << "\n\nTHE DECRYPTED MESSAGE IS:" << std::endl;
-    for (size_t i = 0; i < maxLength; i++) {
-        printf("%c", (char) decryptedText[i]);
+    for (size_t i = 0; i < maxLength; ++i) {
+        std::cout << decryptedText[i] << " ";
     }
+
 
     std::cout << std::endl << std::endl;
 
@@ -92,7 +106,7 @@ int main() {
     delete[] encryptedText;
     delete[] decryptedText;
 
-    test_file_rsa();
+    test_file_rsa(p, q, n, t, e, d);
 
     return 0;
 }
@@ -149,26 +163,12 @@ void decryptFile(const std::string &inputFile, const std::string &outputFile, lo
     std::cout << "File decrypted successfully." << std::endl;
 }
 
-void test_file_rsa() {
-    long int p, q, n, t, e, d;
+void test_file_rsa(long int p, long int q, long int n, long int t, long int e, long int d) {
+    // long int p, q, n, t, e, d;
     bool flag;
     std::string inputFile, outputFile;
 
     std::cout << "Welcome to RCA program" << std::endl << std::endl;
-
-    // Inputting prime numbers p and q
-    // (Code for inputting p, q, computing n, t, e, and d goes here)
-
-    // Assuming values of p, q, n, t, e, and d are already computed
-    // (For simplicity, these values can be hardcoded or obtained from user input)
-
-    // Example values (replace these with actual computation):
-    p = 61;
-    q = 53;
-    n = p * q;
-    t = (p - 1) * (q - 1);
-    e = 17;
-    d = 2753;
 
     std::cout << "Enter input file name: ";
     std::cin >> inputFile;
@@ -176,7 +176,6 @@ void test_file_rsa() {
     std::cout << "Enter output file name: ";
     std::cin >> outputFile;
 
-    // Encrypt file
     encryptFile(inputFile, outputFile + ".enc", e, n);
 
     // Decrypt file
